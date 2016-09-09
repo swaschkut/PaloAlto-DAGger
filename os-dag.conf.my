@@ -1,0 +1,22 @@
+[DEFAULT]
+host = localhost
+debug = true
+
+[oslo_messaging_rabbit]
+rabbit_userid = nova
+rabbit_password = qgALhv50l8rSoqipJJsZP7Mx
+rabbit_hosts = 10.5.175.43:5673
+
+[openstack]
+tenant_name = demo
+auth_url = http://10.5.175.41:5000/v2.0
+username = admin
+password = paloalto
+insecure_ssl = true
+neutron_url = http://10.5.175.41:9696
+
+[panwdevice]
+device_tag_prefix = openstack
+api_username = admin
+api_password = admin
+hostname = 10.5.175.132
