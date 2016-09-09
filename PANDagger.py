@@ -11,25 +11,28 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-import panwdagger.osdriver
 import logging
+import os
+
 import panwdagger.dag
+import panwdagger.osdriver
+
+# override default location of the config file
+os.environ['OS_CLIENT_CONFIG_FILE'] = os.getcwd() + '/clouds.yaml'
 
 __author__ = 'Ivan Bojer'
-
-# def collect_all_vm_addrs():
 
 
 def main():
     dag = panwdagger.dag.DAG()
     os = panwdagger.osdriver.OpenStack()
     tags = os.get_tags()
-    dag.register_tags(tags)
+    dag.register_tags_with_sync(tags)
 
 
 if __name__ == "__main__":
     logging.basicConfig(
-        format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)d) %(name)s %(message)s',
+        format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)d) %(message)s',
         datefmt='%Y%m%d %T',
         level=logging.INFO)
 

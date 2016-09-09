@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import unittest
+
+import panwdagger.dag
 import panwdagger.osdriver
 
 __author__ = 'Ivan Bojer'
@@ -26,4 +28,9 @@ class OpenStackStatusTests(unittest.TestCase):
 
         servers = os.get_servers()
         sec_groups = os.get_security_groups(fields=['name', 'id', 'tenant_id'])
+
+    def test_register_address(self):
+        dag = panwdagger.dag.DAG()
+        dag.register_tags('1.2.3.4', 'testtag')
+        dag.unregister_tags('1.2.3.4', 'testtag')
 
