@@ -1,0 +1,14 @@
+clouds:
+  the_cloud:
+    region_name: RegionOne
+    auth:
+      auth_url: http://10.5.175.41:5000/v2.0
+      username: admin
+      password: paloalto
+      project_name: admin
+    vmseries:
+      username: admin
+      password: admin
+      hostname: 10.5.175.144
+    tag:
+      prefix: ivan
