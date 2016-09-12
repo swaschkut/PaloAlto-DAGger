@@ -12,3 +12,5 @@ clouds:
       hostname: 10.5.175.144
     tag:
       prefix: ivan
+  refresh_in_seconds: 10
+  debug: False
