@@ -13,27 +13,49 @@
 #  limitations under the License.
 import logging
 import os
+import time
+
+import yaml
 
 import panwdagger.dag
 import panwdagger.osdriver
 
+__author__ = 'Ivan Bojer'
+
 # override default location of the config file
 os.environ['OS_CLIENT_CONFIG_FILE'] = os.getcwd() + '/clouds.yaml'
-
-__author__ = 'Ivan Bojer'
+LOG = logging.getLogger(__name__)
+with open(os.environ['OS_CLIENT_CONFIG_FILE'], 'r') as ymlfile:
+    cfg = yaml.load(ymlfile)
 
 
 def main():
     dag = panwdagger.dag.DAG()
-    os = panwdagger.osdriver.OpenStack()
-    tags = os.get_tags()
-    dag.register_tags_with_sync(tags)
+    openstack = panwdagger.osdriver.OpenStack()
+
+    refresh_in_seconds = int(cfg['clouds']['refresh_in_seconds'])
+
+    try:
+        while True:
+            LOG.info('Refreshing tags...')
+            tags = openstack.get_tags()
+            added, removed = dag.register_tags_with_sync(tags)
+            LOG.info('Added: %s adr, removed: %s adr. Next refresh in: %ss', added, removed, refresh_in_seconds)
+            time.sleep(refresh_in_seconds)
+    except KeyboardInterrupt:
+        LOG.info('Exit!')
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)d) %(message)s',
-        datefmt='%Y%m%d %T',
-        level=logging.INFO)
-
+    logging.getLogger("requests").setLevel(logging.WARNING)
+    if bool(cfg['clouds']['debug']):
+        logging.basicConfig(
+            format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)d) %(message)s',
+            datefmt='%Y%m%d %T',
+            level=logging.DEBUG)
+    else:
+        logging.basicConfig(
+            format='%(asctime)s [%(levelname)s] %(message)s',
+            datefmt='%Y%m%d %T',
+            level=logging.INFO)
     main()
