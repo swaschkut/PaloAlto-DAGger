@@ -11,9 +11,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from pandevice.base import PanDevice
-import yaml
 import logging
+
+import yaml
+
+from pandevice.base import PanDevice
 
 __author__ = 'Ivan Bojer'
 
@@ -42,3 +44,11 @@ device.userid.register('1.1.1.2', ['ivan-admin'])
 # addresses2 = device.userid.get_all_registered_ip()
 # for ip, tags in addresses2.iteritems():
 #     print ip, tags
+
+        # vmcfg = cfg['clouds']['the_cloud']
+        # vmseries_keys = {x for x in vmcfg if x.startswith('vmseries')}
+        # self.devices = []
+        # for vmkeys in vmseries_keys:
+        #     self.devices.append(PanDevice.create_from_device(cfg['clouds']['the_cloud'][vmkeys]['hostname'],
+        #                                                      cfg['clouds']['the_cloud'][vmkeys]['username'],
+        #                                                      cfg['clouds']['the_cloud'][vmkeys]['password']))
