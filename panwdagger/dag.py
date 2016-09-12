@@ -27,8 +27,7 @@ class DAG(object):
 
     def __init__(self):
         import os
-        print os.getcwd()
-        with open(os.getcwd()+'/clouds.yaml', 'r') as ymlfile:
+        with open(os.environ['OS_CLIENT_CONFIG_FILE'], 'r') as ymlfile:
             cfg = yaml.load(ymlfile)
         vmcfg = cfg['clouds']['the_cloud']['vmseries']
         self.device = PanDevice.create_from_device(vmcfg['hostname'],
@@ -40,6 +39,8 @@ class DAG(object):
 
         self.__clear_stale_tags()
 
+        self.tag_db = collections.defaultdict(dict)
+
     def register_tags_with_sync(self, tags):
         """Function that will register tags and remove the ones that are not
         present in the tags list. The assumption is that if tags are not present
@@ -48,6 +49,10 @@ class DAG(object):
         """
         if not isinstance(tags, dict):
             raise ValueError('Argument is not of the type dict')
+
+        if cmp(tags, self.tag_db) == 0:
+            LOG.info('No tag changes detected')
+            return 0, 0
 
         for tag_id in tags:
             project_name = tags[tag_id]['project_name']
@@ -61,13 +66,21 @@ class DAG(object):
                         tag = [tag]
                     self.unregister_tags(ip, tag)
 
+        # store tags
+        self.tag_db = tags
+
+        added = len(tags)
+        removed = len(delta_addresses)
+
+        return added, removed
+
     def register_tags(self, ip, tags):
         if not isinstance(tags, list):
             tags = [tags]
 
         for tag in tags:
             comp_tag = self.PREFIX + tag
-            LOG.info('Tag %s with %s', ip, comp_tag)
+            LOG.debug('Tag %s --> %s', ip, comp_tag)
             self.device.userid.register(ip, comp_tag)
 
     def unregister_tags(self, ip, tags):
@@ -75,7 +88,7 @@ class DAG(object):
             tags = [tags]
 
         for tag in tags:
-            LOG.info('Untag %s from %s', tag, ip)
+            LOG.debug('Untag %s --> %s', tag, ip)
             self.device.userid.unregister(ip, tag)
 
     def get_delta(self, new_addresses):
@@ -116,6 +129,8 @@ class DAG(object):
         # if none registered return
         if not addresses:
             return
+
+        LOG.debug('Clearing tags from %s', self.device)
         for ip, tags in addresses.iteritems():
             for tag in tags:
                 if self.PREFIX in tag:
