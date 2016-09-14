@@ -39,8 +39,6 @@ class DAG(object):
 
         self.__clear_stale_tags()
 
-        self.tag_db = collections.defaultdict(dict)
-
     def register_tags_with_sync(self, tags):
         """Function that will register tags and remove the ones that are not
         present in the tags list. The assumption is that if tags are not present
@@ -50,15 +48,20 @@ class DAG(object):
         if not isinstance(tags, dict):
             raise ValueError('Argument is not of the type dict')
 
-        if cmp(tags, self.tag_db) == 0:
-            LOG.info('No tag changes detected')
+        cur_addr = self.device.userid.get_all_registered_ip()
+        if (tags and cur_addr) and cmp(tags.viewkeys(), cur_addr.viewkeys()) == 0:
+            LOG.info('No tag additions detected')
             return 0, 0
+        else:
+            for tag_id in tags:
+                project_name = tags[tag_id]['project_name']
+                self.register_tags(tag_id, project_name)
 
-        for tag_id in tags:
-            project_name = tags[tag_id]['project_name']
-            self.register_tags(tag_id, project_name)
+            LOG.info('Added %s tags', len(tags))
 
-        delta_addresses = self.get_delta(tags)
+        added = 0
+        removed = 0
+        delta_addresses = self.get_delta(tags, cur_addr)
         if delta_addresses:
             for ip, tags in delta_addresses.iteritems():
                 for tag in tags:
@@ -66,11 +69,10 @@ class DAG(object):
                         tag = [tag]
                     self.unregister_tags(ip, tag)
 
-        # store tags
-        self.tag_db = tags
-
-        added = len(tags)
-        removed = len(delta_addresses)
+            added = len(tags)
+            removed = len(delta_addresses)
+        else:
+            LOG.info('No deltas detected')
 
         return added, removed
 
@@ -91,7 +93,7 @@ class DAG(object):
             LOG.debug('Untag %s --> %s', tag, ip)
             self.device.userid.unregister(ip, tag)
 
-    def get_delta(self, new_addresses):
+    def get_delta(self, new_addresses, cur_addr):
         """
         Function returns all addresses with the PREFIX that are
         not present in the given dict. These are most likely ones that got removed.
@@ -105,11 +107,10 @@ class DAG(object):
         # self.device.userid.register('1.1.1.2', ['ivan-admin'])
         # self.device.userid.register('0.0.0.0', ['craze'])
 
-        addresses = self.device.userid.get_all_registered_ip()
         # if none registered return
-        if addresses:
+        if cur_addr:
             addresses_with_prefix = collections.defaultdict(dict)
-            for ip, tags in addresses.iteritems():
+            for ip, tags in cur_addr.iteritems():
                 for tag in tags:
                     if self.PREFIX in tag:
                         addresses_with_prefix[ip] = tags

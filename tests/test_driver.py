@@ -23,20 +23,21 @@ LOG = logging.getLogger()
 
 __author__ = 'Ivan Bojer'
 
-with open("clouds.yaml", 'r') as ymlfile:
+with open("../clouds.yaml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 vmcfg = cfg['clouds']['the_cloud']['vmseries']
 device = PanDevice.create_from_device( vmcfg['hostname'],
                                        vmcfg['username'],
                                        vmcfg['password'] )
 
-# device.userid.clear_all_registered_ip()
-device.userid.register('1.1.1.2', ['ivan-admin'])
-
 # addresses = device.userid.get_all_registered_ip()
-# for ip, tags in addresses.iteritems():
-#     for tag in tags:
-#         print ip, tag
+# device.userid.clear_all_registered_ip()
+# device.userid.register('1.1.1.2', ['ivan-admin'])
+
+addresses = device.userid.get_all_registered_ip()
+for ip, tags in addresses.iteritems():
+    for tag in tags:
+        print ip, tag
 
 # adr = device.userid.unregister('1.1.1.2', 'b')
 # print adr
