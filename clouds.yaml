@@ -4,13 +4,13 @@ clouds:
     auth:
       auth_url: http://10.5.175.41:5000/v2.0
       username: admin
-      password: paloalto
+      password: admin
       project_name: admin
     vmseries:
       username: admin
-      password: admin
+      password: admin2
       hostname: 10.5.175.144
     tag:
       prefix: ivan
   refresh_in_seconds: 10
-  debug: False
+  debug: True

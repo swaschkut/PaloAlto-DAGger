@@ -27,6 +27,7 @@ class DAG(object):
 
     def __init__(self):
         import os
+        LOG.info('Loading configuration file...%s', os.environ['OS_CLIENT_CONFIG_FILE'])
         with open(os.environ['OS_CLIENT_CONFIG_FILE'], 'r') as ymlfile:
             cfg = yaml.load(ymlfile)
         vmcfg = cfg['clouds']['the_cloud']['vmseries']
