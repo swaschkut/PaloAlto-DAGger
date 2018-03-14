@@ -11,11 +11,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 import collections
 import logging
 
-import yaml
-
+from yaml import load
 from pandevice.base import PanDevice
 
 __author__ = 'Ivan Bojer'
@@ -29,7 +29,7 @@ class DAG(object):
         import os
         LOG.info('Loading configuration file...%s', os.environ['OS_CLIENT_CONFIG_FILE'])
         with open(os.environ['OS_CLIENT_CONFIG_FILE'], 'r') as ymlfile:
-            cfg = yaml.load(ymlfile)
+            cfg = load(ymlfile)
         vmcfg = cfg['clouds']['the_cloud']['vmseries']
         self.device = PanDevice.create_from_device(vmcfg['hostname'],
                                                    vmcfg['username'],
