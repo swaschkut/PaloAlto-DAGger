@@ -25,3 +25,7 @@ Modify 'clouds.yaml' to suite your needs.
 ## Running
 
     $ python PANWDagger.py
+
+## Disclaimer
+
+PaloAlto-DAGger is for illustrative purposes only. This software is supplied "AS IS" without any warranties and support.

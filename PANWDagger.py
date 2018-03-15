@@ -11,9 +11,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 import logging
 import os
 import time
+import sys
 
 import yaml
 
@@ -47,6 +49,10 @@ def main():
 
 
 if __name__ == "__main__":
+
+    if sys.version_info[0] > 2:
+        sys.exit("Python 2 is required and you are running %s." % sys.version)
+
     logging.getLogger("requests").setLevel(logging.WARNING)
     if bool(cfg['clouds']['debug']):
         logging.basicConfig(
